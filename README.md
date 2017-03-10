@@ -1,5 +1,5 @@
 # MacroResults
-preliminary assessment of data from IA macro. This repor is meant for storing scripts for generating results from a image analysis macro, recording interpertations and new bugs.
+This repo is meant for storing scripts for generating results from a image analysis macro, recording interpertations and new bugs.
 
 Discription of files
 print aborted results.ijm
