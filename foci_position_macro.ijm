@@ -193,33 +193,13 @@ while(y>1){
 						
 }//end while loop				
 var blobCount = 0;	
-//SC rename  ridge detection items not being renamed
-JPcount = 0;//this doesn't need to be globally set since they are all deleted
-print("start red channel. sc count: "+ scCount + ". blobcount: "+blobCount+". stuff in manager: "+roiManager("count"));
-for(i=centromereCount;i<roiManager("count");i++){
-	roiManager("select",i);
-	if (startsWith(Roi.getName(), "JP-")) {
-		roiManager("delete");
-		i--;
-	}
-	else {
-		if (startsWith(Roi.getName(), "SC")) {
-			scCount++;
-			//roiManager("Rename", roiManager("index") + "SC "); // edit renamed above			
-			roiManager("measure");
-			sclength = getResult("Length",i);
-			Roi.setProperty("SC Results length", sclength); // this is a property of the SC
-			setResult("SC index", i, roiManager("index")); // link to SC roi index
-			}
-		}
-	}
-print("SC count: "+scCount);
 
 //loop through centromeres, find overlapping SC, form blobjects
 for(cen=0; cen < centromereCount+1;cen++){
 	roiManager("Select",cen);
 	if(matches(Roi.getName(), ".*centromere.*")) {
 		makeBlob(cen);// first blob formation
+		
 		print("this is cen " + cen);
 		roiManager("update");
 		blobCount++;
@@ -829,13 +809,13 @@ function reverseArray(a) {
        }
   }//end function  
 
+//add marker for visualing orientation
+//makeArrow(x1, y1, x2, y2, style)
 function makeBlob(cen){
-	print("entering makeblob");
 	roiManager("Select", cen);
 	Roi.setProperty("reverse", "no");//default
 	Roi.getCoordinates(centx, centy);
 	roiManager("deselect");
-//need to set reverse property for this verison	
 	for(noncen=centromereCount+fociCount; noncen < roiManager("count"); noncen++) { // make sure these counters will work in function format
 		roiManager("Select", noncen); //select roi to test if SC
 		if(matches(Roi.getName(), ".*SC.*")) { 
@@ -848,6 +828,9 @@ function makeBlob(cen){
 		 						roiManager("Select", cen);
 								if(Roi.contains(SCx[5], SCy[5])) {  //change this to [5], since some ends of SC extend past centromere
 									print(cen + " " + noncen + "SC array starts at centromere");
+									makeArrow(SCx[0], SCy[0], SCx[15], SCy[15], "Filled Small");
+									roiManager("Add");
+									
 									Roi.setProperty("reverse", "no");//this is set for centromeres
 									roiManager("update");//update required to set property in play
 										}									
@@ -855,6 +838,10 @@ function makeBlob(cen){
 									print(cen + " " + noncen + "centromere is at end of array. Reversing Arrays");
 									SCx = Array.reverse(SCx);//
 									SCy = Array.reverse(SCy);
+									makeArrow(SCx[0], SCy[0], SCx[15], SCy[15], "Filled Small");
+									
+									roiManager("Add");
+									roiManager("Set Color", "red");
 									Roi.setProperty("reverse", "yes");//set for centromeres
 									roiManager("update");
 									}
@@ -915,12 +902,19 @@ function makeBlob2(cen, sc){
 		if(Roi.contains(nSCx[5], nSCy[5])) { //change this index to 5th
 			print(cen + " " + sc + "SC array starts at centromere");//no reverse needed
 			Roi.setProperty("reverse", 'no');//centromere property
+			makeArrow(nSCx[0], nSCy[0], nSCx[15], nSCy[15], "Filled Small");
+			roiManager("Add");
 			roiManager("update");
 			
 		} if(Roi.contains(nSCx[nSCx.length-4], nSCy[nSCy.length-4])) { //change to index 4
+			
+			makeArrow(nSCx[0], nSCy[0], nSCx[15], nSCy[15], "Filled Small");
+			roiManager("Add");
+			roiManager("Set Color", "red");
 			nSCx = Array.reverse(nSCx);
 			nSCy = Array.reverse(nSCy);
 //set reverse property
+
 			Roi.setProperty("reverse", 'yes');//centromere property
 			roiManager("update");
 			print(cen + " " + sc + "centromere is at end of array. Array reversed with function");					
